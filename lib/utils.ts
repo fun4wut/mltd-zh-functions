@@ -7,19 +7,6 @@ const fuse = new Fuse<MLTDBase>([], {
   keys: ['evtName', 'evtId'],
 })
 
-// fake logger
-export const Logger = {
-  info(s: string) {
-    return s
-  },
-  success(s: string) {
-    return s
-  },
-  warning(s: string) {
-    return s
-  },
-}
-
 export const evtCache = {
   setFuse: (list: MLTDBase[]) => fuse.setCollection(list),
   fuzzySearch: (pattern: string) =>

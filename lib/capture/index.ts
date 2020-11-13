@@ -6,7 +6,7 @@ import fs from 'fs'
 import { decRes, encReq } from './magic'
 import { createReq, RankType, ReqMethod } from './defs'
 import { Rank } from '../types'
-import { Logger } from '../utils'
+import { Operator } from 'lib/operator'
 
 const BaseUrl = 'https://theaterdays-zh.appspot.com'
 // login用的body，因为不需要动，所以直接传上去就行
@@ -62,75 +62,80 @@ const axios = _axios.create({
   },
 })
 
-const wrappedFetch = (url: string, data: any) =>
-  promiseRetry(
-    (retry, times) =>
-      axios
-        .post(url, data)
-        .then(async res => {
-          const json = await decRes(res.data)
-          if (!!json.error) {
-            throw new Error('token gg')
-          }
-          return json
-        })
-        .catch(async err => {
-          if (err?.message === 'token gg' || err?.response?.status === 401) {
-            Logger.info('土豆身份过期，重新登录')
-            await login()
-          } else {
-            Logger.warning(`抓包失败，重新尝试，尝试次数${times}`)
-            await login()
-          }
-          return retry(err)
-        }),
-    {
-      retries: 3,
-    }
-  )
+export class CaptureOperator extends Operator {
+  wrappedFetch(url: string, data: any) {
+    return promiseRetry(
+      (retry, times) =>
+        axios
+          .post(url, data)
+          .then(async res => {
+            const json = await decRes(res.data)
+            if (!!json.error) {
+              throw new Error('token gg')
+            }
+            return json
+          })
+          .catch(async err => {
+            if (err?.message === 'token gg' || err?.response?.status === 401) {
+              this.logger.warn('土豆身份过期，重新登录')
+              await this.login()
+            } else {
+              this.logger.warn(`抓包失败，重新尝试，尝试次数${times}`)
+              await this.login()
+            }
+            return retry(err)
+          }),
+      {
+        retries: 3,
+      }
+    )
+  }
 
-export async function getRanks(evtId: number, rkType: RankType) {
-  const reqData = [1, 15, 250, 500, 1000, 2000].map(num =>
-    createReq({
-      method: ReqMethod.Ranking,
-      id: `pickup${num}`,
-      params: [
-        {
-          ranking_compare_type: 1,
-          only_use_ranking_data: true,
-          lounge_id: '',
-          lounge_id_list: [],
-          offset_rank: num,
-          limit: 1,
-          mst_event_id: evtId,
-          ranking_type: rkType,
-        },
-      ],
-    })
-  )
+  // 抓取档线信息
+  async getRanks(evtId: number, rkType: RankType) {
+    const reqData = [1, 15, 250, 500, 1000, 2000].map(num =>
+      createReq({
+        method: ReqMethod.Ranking,
+        id: `pickup${num}`,
+        params: [
+          {
+            ranking_compare_type: 1,
+            only_use_ranking_data: true,
+            lounge_id: '',
+            lounge_id_list: [],
+            offset_rank: num,
+            limit: 1,
+            mst_event_id: evtId,
+            ranking_type: rkType,
+          },
+        ],
+      })
+    )
 
-  Logger.info(`开始抓取档线数据，evtId: ${evtId}`)
+    this.logger.info(`开始抓取档线数据，evtId: ${evtId}`)
 
-  const res = await wrappedFetch(
-    '/rpc/RankingService.GetRanking',
-    encReq(reqData)
-  )
-  return {
-    count: res[0].result.summary_count,
-    summaryTime: new Date(res[0].result.summary_date),
-    scores: res.map(item => ({
-      score: item.result.ranking_list[0].score,
-      rank: item.result.ranking_list[0].rank,
-    })),
-  } as Rank
-}
+    const res = await this.wrappedFetch(
+      '/rpc/RankingService.GetRanking',
+      encReq(reqData)
+    )
+    return {
+      count: res[0].result.summary_count,
+      summaryTime: new Date(res[0].result.summary_date),
+      scores: res.map(item => ({
+        score: item.result.ranking_list[0].score,
+        rank: item.result.ranking_list[0].rank,
+      })),
+    } as Rank
+  }
 
-export async function login() {
-  const res = await axios
-    .post('/auth/AuthService.Login', loginData)
-    .then(res => decRes(res.data))
-    .then(res => res.result.token)
-  axios.defaults.headers.Authorization = `Bearer ${res}`
-  Logger.success('登录成功')
-  setAuth(res)
+  // 登录
+  async login() {
+    const res = await axios
+      .post('/auth/AuthService.Login', loginData)
+      .then(res => decRes(res.data))
+      .then(res => res.result.token)
+    axios.defaults.headers.Authorization = `Bearer ${res}`
+    this.logger.info('登录成功')
+    setAuth(res)
+  }
 }
