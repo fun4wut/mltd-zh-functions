@@ -6,7 +6,7 @@ import fs from 'fs'
 import { decRes, encReq } from './magic'
 import { createReq, RankType, ReqMethod } from './defs'
 import { Rank } from '../types'
-import { Operator } from 'lib/operator'
+import { Operator } from '../operator'
 
 const BaseUrl = 'https://theaterdays-zh.appspot.com'
 // login用的body，因为不需要动，所以直接传上去就行

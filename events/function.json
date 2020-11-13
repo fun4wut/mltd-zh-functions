@@ -13,8 +13,8 @@
     {
       "type": "http",
       "direction": "out",
-      "name": "res"
+      "name": "$return"
     }
   ],
-  "scriptFile": "../dist/MLTD-API/index.js"
+  "scriptFile": "../dist/events/index.js"
 }

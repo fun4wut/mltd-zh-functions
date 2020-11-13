@@ -1,3 +1,6 @@
+# custom
+.auth_cache
+
 # Logs
 logs
 *.log

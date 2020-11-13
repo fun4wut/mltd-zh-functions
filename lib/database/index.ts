@@ -6,9 +6,9 @@ import { CaptureOperator } from '../capture'
 import { RankType } from '../capture/defs'
 import { MLTDEvtModel, MLTDRankModel, MLTDDateModel } from './defs'
 import { evtCache, Dict } from '../utils'
-import { isDocument } from '@typegoose/typegoose'
+import { isDocument, mongoose } from '@typegoose/typegoose'
 import { EvtType } from '../types'
-import { Operator } from 'lib/operator'
+import { Operator } from '../operator'
 import { Context } from '@azure/functions'
 
 const BaseUrl = 'https://api.matsurihi.me/mltd/v1/zh'
@@ -27,12 +27,12 @@ const axios = _axios.create({
 })
 
 export class DBOperator extends Operator {
-  capture: CaptureOperator
+  private capture: CaptureOperator
   constructor(ctx: Context) {
     super(ctx)
     this.capture = new CaptureOperator(ctx)
   }
-  wrappedFetch(url: string, params?: unknown) {
+  private wrappedFetch(url: string, params?: unknown) {
     return promiseRetry(
       (retry, times) =>
         axios
