@@ -1,4 +1,3 @@
-import 'module-alias/register'
 import { AzureFunction, Context } from '@azure/functions'
 import { DBOperator } from '@lib/database'
 
