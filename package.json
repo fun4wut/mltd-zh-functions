@@ -9,6 +9,9 @@
     "start": "func start",
     "test": "echo \"No tests yet...\""
   },
+  "_moduleAliases": {
+    "@lib": "dist/lib"
+  },
   "dependencies": {
     "@typegoose/typegoose": "^7.4.2",
     "axios": "^0.21.0",
@@ -16,6 +19,7 @@
     "crypto-js": "^4.0.0",
     "fuse.js": "^6.4.3",
     "https-proxy-agent": "^5.0.0",
+    "module-alias": "^2.2.2",
     "mongoose": "^5.10.12",
     "promise-retry": "^2.0.1",
     "tmp": "^0.2.1",

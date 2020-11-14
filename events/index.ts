@@ -1,7 +1,7 @@
+import 'module-alias/register'
 import { AzureFunction, Context, HttpRequest } from '@azure/functions'
-
 // to init db and evtCache
-require('../lib/startup')
+require('@lib/startup')
 
 const httpTrigger: AzureFunction = async function (
   ctx: Context,

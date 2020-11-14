@@ -1,5 +1,6 @@
+import 'module-alias/register'
 import { AzureFunction, Context } from '@azure/functions'
-import { DBOperator } from '../lib/database'
+import { DBOperator } from '@lib/database'
 
 const timerTrigger: AzureFunction = async function (
   ctx: Context,
