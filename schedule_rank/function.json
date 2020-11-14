@@ -1,0 +1,11 @@
+{
+  "bindings": [
+    {
+      "name": "scheduleRank",
+      "type": "timerTrigger",
+      "direction": "in",
+      "schedule": "0 3,33 * * * *"
+    }
+  ],
+  "scriptFile": "../dist/schedule_rank/index.js"
+}

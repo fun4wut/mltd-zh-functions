@@ -1,0 +1,11 @@
+{
+  "bindings": [
+    {
+      "name": "scheduleEvt",
+      "type": "timerTrigger",
+      "direction": "in",
+      "schedule": "0 15 15 * * *"
+    }
+  ],
+  "scriptFile": "../dist/schedule_evt/index.js"
+}
