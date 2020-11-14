@@ -9,19 +9,29 @@ export enum EvtType {
   Anniversary,
 }
 
-export interface MLTDBase {
+export interface IEvtBase {
   evtId: number
   evtName: string
   evtType: EvtType
 }
 
-export interface Rank {
+export interface IEvtRank {
   scores: {
     rank: number
     score: number
   }[]
   summaryTime: Date
   count: number
+}
+
+export interface IEvtDate {
+  evtBegin: Date
+
+  evtEnd: Date
+
+  boostBegin: Date | null
+
+  boostEnd: Date | null
 }
 
 /**

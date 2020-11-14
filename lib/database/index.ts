@@ -4,10 +4,9 @@ import { HttpsProxyAgent } from 'https-proxy-agent'
 
 import { CaptureOperator } from '../capture'
 import { RankType } from '../capture/defs'
-import { MLTDEvtModel, MLTDRankModel, MLTDDateModel } from './defs'
+import { MLTDEvtModel, MLTDRankModel } from './defs'
 import { evtCache, Dict } from '../utils'
-import { isDocument, mongoose } from '@typegoose/typegoose'
-import { EvtType } from '../types'
+import { EvtType, IEvtDate } from '../types'
 import { Operator } from '../operator'
 import { Context } from '@azure/functions'
 
@@ -54,11 +53,9 @@ export class DBOperator extends Operator {
   async fetchBorderPoints(_evtId?: number) {
     const evtId = _evtId ?? evtCache.currentEvt().evtId
     // evt必定存在
-    const evt = await MLTDEvtModel.findByEvtId(evtId).then(evt =>
-      evt!.populate('date').execPopulate()
-    )
+    const evt = (await MLTDEvtModel.findByEvtId(evtId))!
     // 非档线活动，不fetch
-    if (evt.evtType <= EvtType.ShowTime || !isDocument(evt.date)) {
+    if (evt.evtType <= EvtType.ShowTime) {
       return evt
     }
     // 最终排名出现
@@ -125,19 +122,19 @@ export class DBOperator extends Operator {
       if (!!curr) {
         return
       }
-      const date = await MLTDDateModel.create({
+      const date: IEvtDate = {
         evtBegin: new Date(item.schedule.beginDate),
         evtEnd: new Date(item.schedule.endDate),
         // 摸鱼活动没有加速
         boostBegin:
           item.type > 2 ? new Date(item.schedule.boostBeginDate) : null,
         boostEnd: item.type > 2 ? new Date(item.schedule.boostEndDate) : null,
-      })
+      }
       await MLTDEvtModel.create({
         evtId: item.id,
         evtName: item.name,
         evtType: item.type,
-        date: date._id,
+        date,
       })
     })
 
@@ -152,7 +149,7 @@ export class DBOperator extends Operator {
    */
   async clearAll() {
     this.logger.warn('开始清空数据库')
-    const models: any[] = [MLTDRankModel, MLTDDateModel, MLTDEvtModel]
+    const models: any[] = [MLTDRankModel, MLTDEvtModel]
     Promise.all(models.map(mod => mod.deleteMany({})))
   }
 }

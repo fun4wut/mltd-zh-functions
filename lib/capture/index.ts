@@ -5,7 +5,7 @@ import fs from 'fs'
 
 import { decRes, encReq } from './magic'
 import { createReq, RankType, ReqMethod } from './defs'
-import { Rank } from '../types'
+import { IEvtRank } from '../types'
 import { Operator } from '../operator'
 
 const BaseUrl = 'https://theaterdays-zh.appspot.com'
@@ -125,7 +125,7 @@ export class CaptureOperator extends Operator {
         score: item.result.ranking_list[0].score,
         rank: item.result.ranking_list[0].rank,
       })),
-    } as Rank
+    } as IEvtRank
   }
 
   // 登录

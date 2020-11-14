@@ -1,14 +1,14 @@
 import Fuse from 'fuse.js'
 import { maybe } from 'typescript-monads'
 
-import { MLTDBase } from './types'
+import { IEvtBase } from './types'
 
-const fuse = new Fuse<MLTDBase>([], {
+const fuse = new Fuse<IEvtBase>([], {
   keys: ['evtName', 'evtId'],
 })
 
 export const evtCache = {
-  setFuse: (list: MLTDBase[]) => fuse.setCollection(list),
+  setFuse: (list: IEvtBase[]) => fuse.setCollection(list),
   fuzzySearch: (pattern: string) =>
     maybe(fuse.search(pattern)[0]).map(elm => elm.item),
   currentEvt: () =>
@@ -18,4 +18,4 @@ export const evtCache = {
 /**
  * evtId到baseEvt的映射
  */
-export const Dict: Map<number, MLTDBase> = new Map()
+export const Dict: Map<number, IEvtBase> = new Map()

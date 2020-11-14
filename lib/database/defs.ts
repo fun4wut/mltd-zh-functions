@@ -6,9 +6,9 @@ import {
   ReturnModelType,
   Severity,
 } from '@typegoose/typegoose'
-import { MLTDBase, EvtType, Rank } from '../types'
+import { IEvtBase, EvtType, IEvtRank, IEvtDate } from '../types'
 
-export class MLTDEvt implements MLTDBase {
+export class MLTDEvt implements IEvtBase {
   @prop({ index: true })
   public evtId!: number
 
@@ -18,8 +18,8 @@ export class MLTDEvt implements MLTDBase {
   @prop({ enum: EvtType })
   public evtType!: EvtType
 
-  @prop({ ref: () => MLTDDate })
-  public date: Ref<MLTDDate>
+  @prop()
+  public date!: IEvtDate
 
   // 指向最新的rank记录
   @prop({ ref: () => MLTDRank })
@@ -33,20 +33,6 @@ export class MLTDEvt implements MLTDBase {
   }
 }
 
-export class MLTDDate {
-  @prop()
-  public evtBegin!: Date
-
-  @prop()
-  public evtEnd!: Date
-
-  @prop()
-  public boostBegin?: Date | null
-
-  @prop()
-  public boostEnd?: Date | null
-}
-
 @modelOptions({
   options: {
     allowMixed: Severity.ALLOW,
@@ -57,16 +43,14 @@ export class MLTDRank {
   public parentEvt!: MLTDEvt
 
   @prop()
-  public eventPoint!: Rank
+  public eventPoint!: IEvtRank
 
   @prop()
-  public highScore!: Rank
+  public highScore!: IEvtRank
 
   // 休息室台服暂时没有
 }
 
 export const MLTDEvtModel = getModelForClass(MLTDEvt)
-
-export const MLTDDateModel = getModelForClass(MLTDDate)
 
 export const MLTDRankModel = getModelForClass(MLTDRank)
