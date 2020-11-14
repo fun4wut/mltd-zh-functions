@@ -1,20 +1,20 @@
 {
   "bindings": [
     {
-      "authLevel": "anonymous",
+      "authLevel": "admin",
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "route": "events/{evtId:int}/rankings/borderPoints",
+      "route": "events/{evtId:int}/rankings",
       "methods": [
-        "get"
+        "post"
       ]
     },
     {
       "type": "http",
       "direction": "out",
-      "name": "$return"
+      "name": "res"
     }
   ],
-  "scriptFile": "../dist/api_events/index.js"
+  "scriptFile": "../dist/manual_rank/index.js"
 }
