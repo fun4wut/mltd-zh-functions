@@ -12,14 +12,15 @@
 
 1. 查询PT档线和高分档线（Rank 1, 15, 250, 500, 1000, 2000）
    API：`/events/{id}/rankings/borderPoints`
+   
    参数：
    
    - 路径参数 `id`：如果为数字，即为活动的id，如果为字符串，则为活动名称（支持模糊查找），如果为0，即为当前活动。
    - 查询参数 `summaryTime`：指定档线的结算时间，请使用JS的 `new Date` 能够识别的字符串格式。
    
    返回：[原版](https://api.matsurihi.me/docs/#mltd-v1-events-rankings)的基础上增加了event本身的字段
-   ```typescript
-    {
+   ```ts
+   {
         //...
         evtId: number
         evtName: string
