@@ -1,8 +1,8 @@
 import { Context } from '@azure/functions'
 import { maybe } from 'typescript-monads'
-import { isDocument } from '@typegoose/typegoose'
+import { isDocument, DocumentType } from '@typegoose/typegoose'
 import { Dict, evtCache } from './utils'
-import { MLTDEvtModel, MLTDRankModel } from './database/defs'
+import { MLTDEvtModel, MLTDRank, MLTDRankModel } from './database/defs'
 import { DBOperator } from './database'
 import { BorderPointsDiff, EvtType } from './types'
 import { Operator } from './operator'
@@ -63,27 +63,52 @@ export class APIOperator extends Operator {
   }
 
   /**
-   * 历史事件档线查询
-   * @param evtName 事件名称（采用模糊匹配搜索）
+   * 活动档线查询
+   * @param evtName 事件名称（采用模糊匹配搜索），若为0则为当前活动
+   * @param summaryTime 指定的结算时间
    */
-  async getHistoryBorderPoints(evtName: string | number) {
+  async getBorderPoints(evtName: string | number, summaryTime?: Date) {
     const evtBase =
       typeof evtName === 'string'
         ? evtCache.fuzzySearch(evtName)
-        : maybe(Dict.get(evtName))
+        : maybe(evtName === 0 ? evtCache.currentEvt() : Dict.get(evtName))
+    console.log(evtBase)
     return evtBase.match({
-      some: obj => {
+      some: async obj => {
         this.logger.info(`要查询的活动evtId为${obj.evtId}`)
-        return obj.evtType > EvtType.ShowTime // 该活动有档线
-          ? MLTDEvtModel.findByEvtId(obj.evtId)
-              .then(evt => evt!.populate('latestRank').execPopulate())
-              .then(evt =>
-                // 确保latestRank存在
-                isDocument(evt.latestRank) && !!evt.latestRank
-                  ? evt
-                  : this.db.fetchBorderPoints(evt.evtId)
-              )
-          : Promise.reject('该活动无档线！')
+        if (obj.evtType <= EvtType.ShowTime) {
+          return Promise.reject('该活动无档线！')
+        }
+        let evt = (await MLTDEvtModel.findByEvtId(obj.evtId))!
+        let rank: DocumentType<MLTDRank>
+        // 指定档线
+        if (summaryTime) {
+          const _rank = await MLTDRankModel.findOne({
+            parentEvt: evt._id,
+            'eventPoint.summaryTime': summaryTime,
+          })
+          if (!_rank) {
+            return Promise.reject('无该时间的档线')
+          }
+          rank = _rank
+        } else {
+          // 未指定档线，即为最新档线
+          evt = await evt
+            .populate('latestRank')
+            .execPopulate()
+            .then(evt =>
+              // 确保latestRank存在
+              isDocument(evt.latestRank) && !!evt.latestRank
+                ? evt
+                : this.db.fetchBorderPoints(evt.evtId)
+            )
+          // 这里偷懒，不想写type guard了
+          rank = (evt.latestRank as unknown) as DocumentType<MLTDRank>
+        }
+        return {
+          ...rank.toObject(),
+          ...evt.toObject(),
+        }
       },
       none: () => Promise.reject('未找到该活动！'),
     })
