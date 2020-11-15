@@ -3,6 +3,7 @@ import 'module-alias/register'
 require('@lib/startup')
 import { AzureFunction, Context } from '@azure/functions'
 import { APIOperator } from '@lib/controller'
+import { customJson } from '@lib/utils'
 
 const httpTrigger: AzureFunction = async function (ctx: Context) {
   const operator = new APIOperator(ctx)
@@ -16,10 +17,7 @@ const httpTrigger: AzureFunction = async function (ctx: Context) {
     // 当前档线
     body = await operator.getCurrentBorderPoints()
   }
-  ctx.res = {
-    // status: 200, /* Defaults to 200 */
-    body,
-  }
+  return customJson(body, ['parentEvt'])
 }
 
 export default httpTrigger

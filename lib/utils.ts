@@ -1,5 +1,6 @@
 import Fuse from 'fuse.js'
 import { maybe } from 'typescript-monads'
+import { MLTDEvt, MLTDRank } from './database/defs'
 
 import { IEvtBase } from './types'
 
@@ -19,3 +20,15 @@ export const evtCache = {
  * evtId到baseEvt的映射
  */
 export const Dict: Map<number, IEvtBase> = new Map()
+
+export const customJson = (
+  obj: unknown,
+  omit?: (keyof MLTDRank | keyof MLTDEvt)[]
+) => ({
+  body: JSON.stringify(obj, (k, v) =>
+    ['_id', '__v', ...(omit ?? [])].includes(k) ? undefined : v
+  ),
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})

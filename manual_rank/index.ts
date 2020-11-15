@@ -5,7 +5,7 @@ import { DBOperator } from '@lib/database'
 const httpTrigger: AzureFunction = async function (ctx: Context) {
   const { evtId } = ctx.bindingData
   await new DBOperator(ctx).fetchBorderPoints(evtId > 0 ? evtId : undefined)
-  ctx.res = {
+  return {
     // status: 200, /* Defaults to 200 */
     body: 'update OK',
   }
