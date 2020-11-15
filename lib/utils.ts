@@ -32,3 +32,12 @@ export const customJson = (
     'Content-Type': 'application/json',
   },
 })
+
+export const customErr = (msg: string) => ({
+  body: {
+    error: {
+      status: 404,
+      message: msg.toString(),
+    },
+  },
+})
