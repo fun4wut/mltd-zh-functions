@@ -47,7 +47,7 @@
     - [x]  date不再是ref
     - [ ]  搬到Azure？500M太少了
 - [ ]  dayjs替换Date
-- [ ]  git webhook
+- [x]  github action
 - [x]  获取档线可以指定summaryTime
 - [ ]  给azure function上个好点的类型提示
 - [ ]  ML涩图：抓取放到OSS中（Azure Blob Storage）
