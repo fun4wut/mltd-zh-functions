@@ -43,9 +43,9 @@
 - [x]  自动重连
 - [x]  Log
 - [x]  档线涨幅（半小时、一天）
-- [ ]  mongo 数据库重构
+- [x]  mongo 数据库重构
     - [x]  date不再是ref
-    - [ ]  搬到Azure？500M太少了
+    - [x]  搬到Azure？500M太少了
 - [ ]  dayjs替换Date
 - [x]  github action
 - [x]  获取档线可以指定summaryTime
@@ -54,7 +54,7 @@
 - [ ]  图片版
     - [ ]  头像资源获取（直接从网上抓吧）
     - [ ]  input绑定到cosmos，收到rank增加后，生成处理图片，放到Blob上
-- [ ]  简繁转换
+- [x]  简繁转换
 - [x]  函数抽离
 - [ ]  GraphQL替代Restful
 - [ ]  与日服档线对比

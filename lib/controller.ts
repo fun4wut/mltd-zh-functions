@@ -72,7 +72,6 @@ export class APIOperator extends Operator {
       typeof evtName === 'string'
         ? evtCache.fuzzySearch(evtName)
         : maybe(evtName === 0 ? evtCache.currentEvt() : Dict.get(evtName))
-    console.log(evtBase)
     return evtBase.match({
       some: async obj => {
         this.logger.info(`要查询的活动evtId为${obj.evtId}`)

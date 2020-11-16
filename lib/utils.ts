@@ -1,7 +1,8 @@
 import Fuse from 'fuse.js'
 import { maybe } from 'typescript-monads'
-import { MLTDEvt, MLTDRank } from './database/defs'
+import { s2t } from 'chinese-s2t'
 
+import { MLTDEvt, MLTDRank } from './database/defs'
 import { IEvtBase } from './types'
 
 const fuse = new Fuse<IEvtBase>([], {
@@ -11,7 +12,7 @@ const fuse = new Fuse<IEvtBase>([], {
 export const evtCache = {
   setFuse: (list: IEvtBase[]) => fuse.setCollection(list),
   fuzzySearch: (pattern: string) =>
-    maybe(fuse.search(pattern)[0]).map(elm => elm.item),
+    maybe(fuse.search(s2t(pattern))[0]).map(elm => elm.item),
   currentEvt: () =>
     Dict.get([...Dict.keys()].reduce((prev, now) => Math.max(now, prev), 0))!,
 }
@@ -21,6 +22,11 @@ export const evtCache = {
  */
 export const Dict: Map<number, IEvtBase> = new Map()
 
+/**
+ * 构造azure function的result
+ * @param obj 要序列化的数据
+ * @param omit 省略的字段
+ */
 export const customJson = (
   obj: unknown,
   omit?: (keyof MLTDRank | keyof MLTDEvt)[]

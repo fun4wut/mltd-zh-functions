@@ -8,12 +8,14 @@ import { maybe } from 'typescript-monads'
 
 const httpTrigger: AzureFunction = function (ctx: Context, req: HttpRequest) {
   const summary = maybe(req.query.summaryTime).match({
-    some: time => new Date(decodeURIComponent(time)),
+    some: time => new Date(time),
     none: () => undefined,
   })
   const operator = new APIOperator(ctx)
   const { evtId } = ctx.bindingData
-  return operator.getBorderPoints(evtId, summary).then(
+  // 判断是数字还是字符串
+  const keyword = !!parseInt(evtId) ? parseInt(evtId) : evtId
+  return operator.getBorderPoints(keyword, summary).then(
     res => customJson(res, ['parentEvt', 'latestRank']),
     err => customErr(err)
   )
