@@ -56,7 +56,7 @@ export class DBOperator extends Operator {
     const evt = (await MLTDEvtModel.findByEvtId(evtId))!
     // 非档线活动，不fetch
     if (evt.evtType <= EvtType.ShowTime) {
-      return evt
+      return Promise.reject('not ranking event')
     }
     // 最终排名出现
     const finalTime = evt.date.evtEnd.getTime() + HALF_HOUR + 1000
@@ -91,7 +91,7 @@ export class DBOperator extends Operator {
     })
     if (exists) {
       this.logger.warn('发现重复的档线，不保存至数据库')
-      return evt
+      return Promise.reject('no newer')
     }
     const rk = await MLTDRankModel.create({
       eventPoint: ptsRes,

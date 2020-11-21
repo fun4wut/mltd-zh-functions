@@ -1,6 +1,7 @@
 import 'module-alias/register'
 import { AzureFunction, Context } from '@azure/functions'
 import { DBOperator } from '@lib/database'
+import { APIOperator } from '@lib/controller'
 
 const timerTrigger: AzureFunction = async function (
   ctx: Context,
@@ -13,7 +14,16 @@ const timerTrigger: AzureFunction = async function (
   }
   ctx.log('Timer trigger function ran!', timeStamp)
   const operator = new DBOperator(ctx)
-  await operator.fetchBorderPoints()
+  try {
+    await operator.fetchBorderPoints()
+    // const api = new APIOperator(ctx)
+    // const diff = await api.getCurrentBorderPoints()
+    // ctx.bindings = {
+    //   outputQueueItem: {},
+    // }
+  } catch (error) {
+    // do nothing
+  }
 }
 
 export default timerTrigger

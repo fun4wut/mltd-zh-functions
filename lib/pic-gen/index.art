@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>档线表</title>
+  <style>
+    .root {
+      padding: 30px 10px 10px 20px;
+      width: 1252px;
+      height: 732px;
+      position: relative;
+    }
+
+    .root::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background: url('https://storage.matsurihi.me/mltd/event_bg/0062.png') no-repeat;
+      background-size: cover;
+      z-index: -1;
+      opacity: .2;
+    }
+
+    .title {
+      font-size: 23px;
+      font-weight: 600;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .time {
+      color: salmon;
+      font-size: 18px;
+      margin-top: 10px;
+    }
+
+    .header {
+      padding-bottom: 5px;
+      border-bottom: 1px solid black;
+    }
+
+    .table {
+      padding-top: 10px;
+      display: grid;
+      grid-template-columns: 13% 20% 20% repeat(3, 15%);
+      row-gap: 10px;
+    }
+
+    .stuff {
+      grid-area: 1 / 1 / 1 / 4;
+    }
+
+    .stuff2 {
+      grid-column-start: 1;
+      grid-column-end: 7;
+    }
+
+    .table div {
+      font-size: 24px;
+    }
+
+    .name {
+      display: flex;
+      align-items: center;
+      background-color: rgb(199, 193, 184);
+      opacity: 0.7;
+      border: 0.5px solid wheat;
+      height: 34px;
+      /* 与icon同高 */
+    }
+
+    .icon {
+      border-radius: 50%;
+      margin-right: 5px;
+      width: 34px;
+      transform: translateX(-17px);
+      border: 0.5px solid wheat;
+    }
+
+    .align-right {
+      justify-self: right;
+    }
+
+    .bold {
+      font-weight: 600;
+    }
+
+    .score {
+      /* justify-self: stretch; */
+      display: flex;
+      justify-content: space-between;
+      text-align: center;
+      background-color: rgb(75, 65, 65);
+      height: 34px;
+      border: 0.5px solid wheat;
+      color: yellowgreen;
+    }
+
+    .half-circle {
+      width: 17px;
+      height: 34px;
+      background-color: rgb(75, 65, 65);
+    }
+
+    .left-circle {
+      transform: translateX(-16px) translateY(-1px);
+      border: 0.5px solid wheat;
+      border-right-width: 0px;
+      border-top-left-radius: 17.5px;
+      border-bottom-left-radius: 17.5px;
+    }
+
+    .right-circle {
+      transform: translateX(16px) translateY(-1px);
+      border: 0.5px solid wheat;
+      border-left-width: 0px;
+      border-top-right-radius: 17.5px;
+      border-bottom-right-radius: 17.5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="root">
+    <div class="header">
+      <div class="title">白金星光剧场~最后的女演员~</div>
+      <div class="title">github: fun4wut</div>
+      <div class="time">更新时间：2020/11/20 20:30</div>
+    </div>
+    <div class="table">
+      <div class="stuff title">活动pt排行榜</div>
+      <div class="align-right bold">-30分</div>
+      <div class="align-right bold">-60分</div>
+      <div class="align-right bold">-24时</div>
+      {{each pt}}
+        <div class="rank">Rank {{$value.rank}}</div>
+        <div class="name">
+          <img class="icon" src="{{$value.icon}}" />
+          <span>{{$value.name}}</span>
+        </div>
+        <div class="score">
+          <div class="half-circle left-circle"></div>
+          {{$value.current}}
+          <div class="half-circle right-circle"></div>
+        </div>
+        <div class="align-right">{{$value.last30min}}</div>
+        <div class="align-right">{{$value.last60min}}</div>
+        <div class="align-right">{{$value.last24h}}</div>
+      {{/each}}
+
+      <div class="stuff2 title">高分排行榜</div>
+      {{each pt}}
+        <div class="rank">Rank {{$value.rank}}</div>
+        <div class="name">
+          <img class="icon" src="{{$value.icon}}" />
+          <span>{{$value.name}}</span>
+        </div>
+        <div class="score">
+          <div class="half-circle left-circle"></div>
+          {{$value.current}}
+          <div class="half-circle right-circle"></div>
+        </div>
+        <div class="align-right">{{$value.last30min}}</div>
+        <div class="align-right">{{$value.last60min}}</div>
+        <div class="align-right">{{$value.last24h}}</div>
+      {{/each}}
+    </div>
+  </div>
+</body>
+
+</html>
