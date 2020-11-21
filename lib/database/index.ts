@@ -91,7 +91,7 @@ export class DBOperator extends Operator {
     })
     if (exists) {
       this.logger.warn('发现重复的档线，不保存至数据库')
-      // return Promise.reject('no newer')
+      return evt // used for test
     }
     const rk = await MLTDRankModel.create({
       eventPoint: ptsRes,

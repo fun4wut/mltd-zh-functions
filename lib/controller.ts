@@ -1,17 +1,31 @@
 import { Context } from '@azure/functions'
 import { maybe } from 'typescript-monads'
 import { isDocument, DocumentType } from '@typegoose/typegoose'
+import dayjs, { Dayjs } from 'dayjs'
 import { Dict, evtCache } from './utils'
-import { MLTDEvtModel, MLTDRank, MLTDRankModel } from './database/defs'
+import { MLTDEvt, MLTDEvtModel, MLTDRank, MLTDRankModel } from './database/defs'
 import { DBOperator } from './database'
 import { BorderPointsDiff, EvtType } from './types'
 import { Operator } from './operator'
 
-const getLastHalf = (d: Date) => new Date(d.getTime() - 1000 * 1800)
+const enum Interval {
+  NOW = 0,
+  HALF_HOUR = 30,
+  ONE_HOUR = 60,
+  ONE_DAY = 60 * 24,
+}
 
-const getLastHour = (d: Date) => new Date(d.getTime() - 1000 * 3600)
-
-const getLastDay = (d: Date) => new Date(d.getTime() - 1000 * 3600 * 24)
+export const getLast = (interval: Interval, baseTime?: Date) => {
+  if (!!baseTime) {
+    return dayjs(baseTime).subtract(interval, 'minute').toDate()
+  }
+  const summary = dayjs()
+  return summary
+    .startOf('hour')
+    .add(summary.minute() > 30 ? 30 : 0, 'minute')
+    .subtract(interval, 'minute')
+    .toDate()
+}
 
 export class APIOperator extends Operator {
   private db: DBOperator
@@ -21,45 +35,26 @@ export class APIOperator extends Operator {
   }
 
   /**
-   * 当前事件档线查询
+   * 获取活动的最后四次档线数据
+   * @param evtId 活动id
    */
-  async getCurrentBorderPoints(): Promise<BorderPointsDiff> {
-    const evtBase = evtCache.currentEvt()
-    if (evtBase.evtType <= EvtType.ShowTime) {
-      return Promise.reject('该活动无档线！')
-    }
-    const evt = await MLTDEvtModel.findByEvtId(evtBase.evtId).then(evt =>
-      evt!.populate('latestRank').execPopulate()
-    )
-
-    // 如果latestRank不存在，说明还没拉到档线
-    if (!isDocument(evt.latestRank) || !evt.latestRank) {
-      return Promise.reject('尚未获得该活动档线！')
-    }
-    const lastHalf = await MLTDRankModel.findOne({
-      parentEvt: evt._id,
-      'eventPoint.summaryTime': getLastHalf(
-        evt.latestRank.eventPoint.summaryTime
-      ),
-    })
-    const lastHour = await MLTDRankModel.findOne({
-      parentEvt: evt._id,
-      'eventPoint.summaryTime': getLastHour(
-        evt.latestRank.eventPoint.summaryTime
-      ),
-    })
-    const lastDay = await MLTDRankModel.findOne({
-      parentEvt: evt._id,
-      'eventPoint.summaryTime': getLastDay(
-        evt.latestRank.eventPoint.summaryTime
-      ),
-    })
-    return {
-      current: evt,
-      lastHalf,
-      lastDay,
-      lastHour,
-    }
+  async getLastFour(evtId: number, baseTime?: Date): Promise<BorderPointsDiff> {
+    return Promise.all(
+      [
+        Interval.NOW,
+        Interval.HALF_HOUR,
+        Interval.ONE_HOUR,
+        Interval.ONE_DAY,
+      ].map(inter => {
+        console.log(getLast(inter, baseTime))
+        return this.getBorderPoints(evtId, getLast(inter, baseTime))
+      })
+    ).then(res => ({
+      current: res[0],
+      lastHalf: res[1],
+      lastHour: res[2],
+      lastDay: res[3],
+    }))
   }
 
   /**
@@ -67,7 +62,10 @@ export class APIOperator extends Operator {
    * @param evtName 事件名称（采用模糊匹配搜索），若为0则为当前活动
    * @param summaryTime 指定的结算时间
    */
-  async getBorderPoints(evtName: string | number, summaryTime?: Date) {
+  async getBorderPoints(
+    evtName: string | number,
+    summaryTime?: Date
+  ): Promise<MLTDRank & MLTDEvt> {
     const evtBase =
       typeof evtName === 'string'
         ? evtCache.fuzzySearch(evtName)
@@ -87,7 +85,7 @@ export class APIOperator extends Operator {
             'eventPoint.summaryTime': summaryTime,
           })
           if (!_rank) {
-            return Promise.reject('无该时间的档线')
+            return Promise.reject(`无该时间的档线: ${summaryTime}`)
           }
           rank = _rank
         } else {

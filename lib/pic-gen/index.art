@@ -128,7 +128,7 @@
 <body>
   <div class="root">
     <div class="header">
-      <div class="title">白金星光剧场~最后的女演员~</div>
+      <div class="title">{{evtName}}</div>
       <div class="title">github: fun4wut</div>
       <div class="time">更新时间：2020/11/20 20:30</div>
     </div>
@@ -154,7 +154,7 @@
       {{/each}}
 
       <div class="stuff2 title">高分排行榜</div>
-      {{each pt}}
+      {{each highScore}}
         <div class="rank">Rank {{$value.rank}}</div>
         <div class="name">
           <img class="icon" src="{{$value.icon}}" />

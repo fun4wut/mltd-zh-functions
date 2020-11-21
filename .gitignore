@@ -1,5 +1,6 @@
 # custom
 .auth_cache
+*.html
 
 # Logs
 logs
