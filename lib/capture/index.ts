@@ -118,18 +118,25 @@ export class CaptureOperator extends Operator {
       '/rpc/RankingService.GetRanking',
       encReq(reqData)
     )
-    return {
-      count: res[0].result.summary_count,
-      summaryTime: new Date(res[0].result.summary_date),
-      scores: res.map(item => {
-        const user = item.result.ranking_list[0]
-        return {
+
+    const scores: IEvtRank['scores'] = []
+    for (const item of res) {
+      const user = item.result.ranking_list[0]
+      if (!user) {
+        continue
+      } else {
+        scores.push({
           score: user.score,
           rank: user.rank,
           name: user.user_summary.name,
           icon: user.user_summary.favorite_card.resource_id,
-        }
-      }),
+        })
+      }
+    }
+    return {
+      count: res[0].result.summary_count,
+      summaryTime: new Date(res[0].result.summary_date),
+      scores,
     }
   }
 

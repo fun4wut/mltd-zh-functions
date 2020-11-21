@@ -19,4 +19,5 @@ import { Dict, evtCache } from './utils'
     )
   )
   evtCache.setFuse([...Dict.values()])
+  console.log('init OK')
 })()

@@ -4,7 +4,6 @@ import { DBOperator } from '@lib/database'
 import { customErr, customJson } from '@lib/utils'
 import { APIOperator } from '@lib/controller'
 import { genPic } from '@lib/pic-gen'
-import dayjs from 'dayjs'
 
 const httpTrigger: AzureFunction = async function (ctx: Context) {
   const { evtId } = ctx.bindingData
@@ -13,10 +12,7 @@ const httpTrigger: AzureFunction = async function (ctx: Context) {
     .then(
       async res => {
         const api = new APIOperator(ctx)
-        const diff = await api.getLastFour(
-          res.evtId,
-          dayjs().date(12).startOf('date').toDate() // used for test
-        )
+        const diff = await api.getLastFour(res.evtId)
         await genPic(diff)
         return customJson('update OK')
       },

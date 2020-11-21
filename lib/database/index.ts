@@ -13,8 +13,6 @@ import { Context } from '@azure/functions'
 const BaseUrl = 'https://api.matsurihi.me/mltd/v1/zh'
 
 const HALF_HOUR = 1000 * 1800
-const notLatest = (d: Date, isHistory: boolean) =>
-  !isHistory && new Date().getTime() - d.getTime() > HALF_HOUR
 
 const axios = _axios.create({
   baseURL: BaseUrl,
@@ -47,6 +45,10 @@ export class DBOperator extends Operator {
       }
     )
   }
+
+  private notLatest(d: Date, isHistory: boolean) {
+    return !isHistory && new Date().getTime() - d.getTime() > HALF_HOUR
+  }
   /**
    * 定期执行，获取最新档线，并保存至数据库
    */
@@ -67,7 +69,7 @@ export class DBOperator extends Operator {
           this.capture.getRanks(evtId, RankType.Score),
         ])
           .then(rankRes =>
-            notLatest(
+            this.notLatest(
               rankRes[0].summaryTime,
               !!_evtId || finalTime === rankRes[0].summaryTime.getTime()
             )
@@ -75,6 +77,7 @@ export class DBOperator extends Operator {
               : rankRes
           )
           .catch(err => {
+            this.logger.warn(err)
             this.logger.warn(`未能抓取到最新档线，之后重试，尝试次数${times}`)
             return retry(err)
           }),
@@ -91,7 +94,7 @@ export class DBOperator extends Operator {
     })
     if (exists) {
       this.logger.warn('发现重复的档线，不保存至数据库')
-      return evt // used for test
+      return Promise.reject('no newer')
     }
     const rk = await MLTDRankModel.create({
       eventPoint: ptsRes,

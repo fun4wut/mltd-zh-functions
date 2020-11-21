@@ -12,7 +12,11 @@ const httpTrigger: AzureFunction = function (ctx: Context, req: HttpRequest) {
     none: () => undefined,
   })
   const operator = new APIOperator(ctx)
-  const { evtId } = ctx.bindingData
+  let { evtId } = ctx.bindingData
+  // 0比较特殊，需要特判。。
+  if (!!evtId.data) {
+    evtId = 0
+  }
   // 判断是数字还是字符串
   const keyword = !!parseInt(evtId) ? parseInt(evtId) : evtId
   return operator.getBorderPoints(keyword, summary).then(

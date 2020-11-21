@@ -46,7 +46,6 @@ export class APIOperator extends Operator {
         Interval.ONE_HOUR,
         Interval.ONE_DAY,
       ].map(inter => {
-        console.log(getLast(inter, baseTime))
         return this.getBorderPoints(evtId, getLast(inter, baseTime))
       })
     ).then(res => ({
