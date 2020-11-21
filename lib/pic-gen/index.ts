@@ -4,6 +4,7 @@ import zipWith from 'lodash.zipwith'
 import fs from 'fs'
 import { resolve } from 'path'
 import { BorderPointsDiff } from '@lib/types'
+import dayjs from 'dayjs'
 
 const getDelta = (cur: { score: number }, base?: { score: number | null }) =>
   base?.score ? (cur.score - base.score).toLocaleString() : '-'
@@ -28,7 +29,9 @@ export async function genPic(diff: BorderPointsDiff) {
       }
     )
   const html = template(resolve(__dirname, '../../../lib/pic-gen/index.art'), {
-    summaryTime: diff.current.eventPoint.summaryTime,
+    summaryTime: dayjs(diff.current.eventPoint.summaryTime).format(
+      'YYYY-MM-DD HH:mm'
+    ),
     evtName: diff.current.evtName,
     background: `https://storage.matsurihi.me/mltd/event_bg/${(
       diff.current.evtId + ''

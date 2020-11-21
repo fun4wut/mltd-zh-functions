@@ -130,7 +130,7 @@
     <div class="header">
       <div class="title">{{evtName}}</div>
       <div class="title">github: fun4wut</div>
-      <div class="time">更新时间：2020/11/20 20:30</div>
+      <div class="time">更新时间：{{summaryTime}}</div>
     </div>
     <div class="table">
       <div class="stuff title">活动pt排行榜</div>
