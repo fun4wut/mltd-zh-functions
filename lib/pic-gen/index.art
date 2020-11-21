@@ -21,7 +21,7 @@
       right: 0;
       top: 0;
       bottom: 0;
-      background: url('https://storage.matsurihi.me/mltd/event_bg/0062.png') no-repeat;
+      background: url('{{background}}') no-repeat;
       background-size: cover;
       z-index: -1;
       opacity: .2;
