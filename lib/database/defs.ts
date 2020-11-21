@@ -47,8 +47,6 @@ export class MLTDRank {
 
   @prop()
   public highScore!: IEvtRank
-
-  // 休息室台服暂时没有
 }
 
 export const MLTDEvtModel = getModelForClass(MLTDEvt)

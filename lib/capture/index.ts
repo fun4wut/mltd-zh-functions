@@ -92,7 +92,7 @@ export class CaptureOperator extends Operator {
   }
 
   // 抓取档线信息
-  async getRanks(evtId: number, rkType: RankType) {
+  async getRanks(evtId: number, rkType: RankType): Promise<IEvtRank> {
     const reqData = [1, 15, 250, 500, 1000, 2000].map(num =>
       createReq({
         method: ReqMethod.Ranking,
@@ -100,7 +100,7 @@ export class CaptureOperator extends Operator {
         params: [
           {
             ranking_compare_type: 1,
-            only_use_ranking_data: true,
+            only_use_ranking_data: false,
             lounge_id: '',
             lounge_id_list: [],
             offset_rank: num,
@@ -112,7 +112,7 @@ export class CaptureOperator extends Operator {
       })
     )
 
-    this.logger.info(`开始抓取档线数据，evtId: ${evtId}`)
+    this.logger.info(`开始抓取详细档线数据，evtId: ${evtId}`)
 
     const res = await this.wrappedFetch(
       '/rpc/RankingService.GetRanking',
@@ -121,11 +121,16 @@ export class CaptureOperator extends Operator {
     return {
       count: res[0].result.summary_count,
       summaryTime: new Date(res[0].result.summary_date),
-      scores: res.map(item => ({
-        score: item.result.ranking_list[0].score,
-        rank: item.result.ranking_list[0].rank,
-      })),
-    } as IEvtRank
+      scores: res.map(item => {
+        const user = item.result.ranking_list[0]
+        return {
+          score: user.score,
+          rank: user.rank,
+          name: user.user_summary.name,
+          icon: user.user_summary.favorite_card.resource_id,
+        }
+      }),
+    }
   }
 
   // 登录

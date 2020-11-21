@@ -19,6 +19,8 @@ export interface IEvtRank {
   scores: {
     rank: number
     score: number
+    name: string | null
+    icon: string | null
   }[]
   summaryTime: Date
   count: number
