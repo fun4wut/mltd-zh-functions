@@ -5,7 +5,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import { Dict, evtCache } from './utils'
 import { MLTDEvt, MLTDEvtModel, MLTDRank, MLTDRankModel } from './database/defs'
 import { DBOperator } from './database'
-import { BorderPointsDiff, EvtType } from './types'
+import { BorderPointsDiff, EvtType, MLTDFull } from './types'
 import { Operator } from './operator'
 
 const enum Interval {
@@ -49,7 +49,7 @@ export class APIOperator extends Operator {
         return this.getBorderPoints(evtId, getLast(inter, baseTime))
       })
     ).then(res => ({
-      current: res[0],
+      current: res[0]!,
       lastHalf: res[1],
       lastHour: res[2],
       lastDay: res[3],
@@ -64,7 +64,7 @@ export class APIOperator extends Operator {
   async getBorderPoints(
     evtName: string | number,
     summaryTime?: Date
-  ): Promise<MLTDRank & MLTDEvt> {
+  ): Promise<MLTDFull | null> {
     const evtBase =
       typeof evtName === 'string'
         ? evtCache.fuzzySearch(evtName)
@@ -84,7 +84,8 @@ export class APIOperator extends Operator {
             'eventPoint.summaryTime': summaryTime,
           })
           if (!_rank) {
-            return Promise.reject(`无该时间的档线: ${summaryTime}`)
+            this.logger.warn(`无该时间的档线: ${summaryTime.toLocaleString()}`)
+            return null
           }
           rank = _rank
         } else {
