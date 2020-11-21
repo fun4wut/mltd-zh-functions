@@ -37,11 +37,16 @@ export async function genPic(diff: BorderPointsDiff) {
     highScore: reOrganize('highScore'),
   })
   fs.writeFileSync('index.html', html)
-  // const browser = await puppter.launch()
-  // const page = await browser.newPage()
-  // await page.setContent(html)
-  // const root = await page.$('.root')
-  // await root!.screenshot({
-  //   path: resolve(__dirname, 'demo.png'),
-  // })
+  const browser = await puppter.launch({
+    args: ['--proxy-server=winip:1080'],
+  })
+  const page = await browser.newPage()
+  await page.setContent(html, {
+    timeout: 5000,
+    waitUntil: 'load',
+  })
+  const root = await page.$('.root')
+  await root!.screenshot({
+    path: 'demo.png',
+  })
 }
