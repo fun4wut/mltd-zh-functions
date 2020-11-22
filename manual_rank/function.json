@@ -16,10 +16,10 @@
       "name": "res"
     },
     {
-      "type": "blob",
+      "type": "queue",
       "direction": "out",
-      "name": "outputBlob",
-      "path": "mltd-img/{DateTime}.png",
+      "name": "outputQueueItem",
+      "queueName": "html-queue",
       "connection": "AzureWebJobsStorage"
     }
   ],

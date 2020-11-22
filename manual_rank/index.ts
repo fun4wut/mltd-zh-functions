@@ -3,7 +3,7 @@ import { AzureFunction, Context } from '@azure/functions'
 import { DBOperator } from '@lib/database'
 import { customErr, customJson } from '@lib/utils'
 import { APIOperator } from '@lib/controller'
-import { PicOperator } from '@lib/pic-gen'
+import { HTMLOperator } from '@lib/html-gen'
 
 const httpTrigger: AzureFunction = async function (ctx: Context) {
   const { evtId } = ctx.bindingData
@@ -13,9 +13,11 @@ const httpTrigger: AzureFunction = async function (ctx: Context) {
       async res => {
         const api = new APIOperator(ctx)
         const diff = await api.getLastFour(res.evtId)
-        const buffer = await new PicOperator(ctx).genPic(diff)
+        const html = new HTMLOperator(ctx).genHTML(diff)
         ctx.bindings.res = customJson('update OK')
-        ctx.bindings.outputBlob = buffer
+        if (!!html) {
+          ctx.bindings.outputQueueItem = html
+        }
         // 使用return，blob ouput不起作用
         // see https://github.com/Azure/azure-functions-nodejs-worker/issues/232
         // return {
