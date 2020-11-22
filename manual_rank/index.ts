@@ -16,7 +16,10 @@ const httpTrigger: AzureFunction = async function (ctx: Context) {
         const html = new HTMLOperator(ctx).genHTML(diff)
         ctx.bindings.res = customJson('update OK')
         if (!!html) {
-          ctx.bindings.outputQueueItem = html
+          ctx.bindings.outputQueueItem = JSON.stringify({
+            src: html,
+            time: diff.current.eventPoint.summaryTime.toISOString(),
+          })
         }
         // 使用return，blob ouput不起作用
         // see https://github.com/Azure/azure-functions-nodejs-worker/issues/232
