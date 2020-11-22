@@ -34,7 +34,7 @@ export class HTMLOperator extends Operator {
       )
     try {
       const html: string = template(
-        resolve(__dirname, '../../../lib/pic-gen/index.art'),
+        resolve(__dirname, '../../../lib/html-gen/index.art'),
         {
           summaryTime: dayjs(diff.current.eventPoint.summaryTime).format(
             'YYYY-MM-DD HH:mm'
