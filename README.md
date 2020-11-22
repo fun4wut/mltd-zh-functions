@@ -58,3 +58,11 @@
 - [x]  函数抽离
 - [ ]  GraphQL替代Restful
 - [ ]  与日服档线对比
+
+## 其他
+
+在 `host.json` 上使用 `extensionBundle` 会导致环境起的很慢（网络问题），这里直接本地安装 `extension`
+
+```bash
+func extensions install --package Microsoft.Azure.WebJobs.Extensions.Storage --version 4.0.2
+```

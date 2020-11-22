@@ -57,8 +57,9 @@ export class PicOperator extends Operator {
         waitUntil: 'load',
       })
       const root = await page.$('.root')
-      await root!.screenshot({
-        path: 'demo.png',
+      return root!.screenshot({
+        encoding: 'binary',
+        // fullPage: true,
       })
     } catch (error) {
       this.logger.error(error)

@@ -13,10 +13,19 @@ const httpTrigger: AzureFunction = async function (ctx: Context) {
       async res => {
         const api = new APIOperator(ctx)
         const diff = await api.getLastFour(res.evtId)
-        await new PicOperator(ctx).genPic(diff)
-        return customJson('update OK')
+        const buffer = await new PicOperator(ctx).genPic(diff)
+        ctx.bindings.res = customJson('update OK')
+        ctx.bindings.outputBlob = buffer
+        // 使用return，blob ouput不起作用
+        // see https://github.com/Azure/azure-functions-nodejs-worker/issues/232
+        // return {
+        //   res: customJson('update OK'),
+        //   ouputBlob: buffer,
+        // }
       },
-      err => customErr(err)
+      err => ({
+        res: customErr(err),
+      })
     )
 }
 
