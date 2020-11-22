@@ -3,7 +3,7 @@ import { AzureFunction, Context } from '@azure/functions'
 import { DBOperator } from '@lib/database'
 import { customErr, customJson } from '@lib/utils'
 import { APIOperator } from '@lib/controller'
-import { genPic } from '@lib/pic-gen'
+import { PicOperator } from '@lib/pic-gen'
 
 const httpTrigger: AzureFunction = async function (ctx: Context) {
   const { evtId } = ctx.bindingData
@@ -13,7 +13,7 @@ const httpTrigger: AzureFunction = async function (ctx: Context) {
       async res => {
         const api = new APIOperator(ctx)
         const diff = await api.getLastFour(res.evtId)
-        await genPic(diff)
+        await new PicOperator(ctx).genPic(diff)
         return customJson('update OK')
       },
       err => customErr(err)
