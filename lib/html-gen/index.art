@@ -17,7 +17,7 @@
     .root {
       padding: 30px 10px 10px 20px;
       width: 1252px;
-      height: 732px;
+      height: 752px;
       position: relative;
     }
 
