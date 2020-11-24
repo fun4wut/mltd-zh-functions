@@ -22,13 +22,13 @@ import { Dict, evtCache } from './utils'
   )
   evtCache.setFuse([...Dict.values()])
 
-  const res = glob.sync(
-    'node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/chrome'
-  )
-  res.forEach(item => {
-    if (fs.statSync(item).mode === 33279) return
-    fs.chmodSync(item, '0777')
-  })
+  // const res = glob.sync(
+  //   'node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/chrome'
+  // )
+  // res.forEach(item => {
+  //   if (fs.statSync(item).mode === 33279) return
+  //   fs.chmodSync(item, '0777')
+  // })
 
   console.log('init OK')
 })()

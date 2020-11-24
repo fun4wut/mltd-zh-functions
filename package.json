@@ -7,7 +7,6 @@
     "watch": "tsc -w",
     "prestart": "npm run build",
     "start": "func start",
-    "postinstall": "chmod -R 777 node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/chrome",
     "test": "echo \"No tests yet...\""
   },
   "_moduleAliases": {
@@ -29,7 +28,6 @@
     "module-alias": "^2.2.2",
     "mongoose": "^5.10.12",
     "promise-retry": "^2.0.1",
-    "puppeteer": "^5.5.0",
     "tmp": "^0.2.1",
     "typescript-monads": "^5.0.0"
   },

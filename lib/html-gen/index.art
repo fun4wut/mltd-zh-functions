@@ -37,7 +37,6 @@
     .title {
       font-size: 23px;
       font-weight: 600;
-      font-family: 'Courier New', Courier, monospace;
     }
 
     .time {
