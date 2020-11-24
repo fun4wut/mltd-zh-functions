@@ -48,6 +48,7 @@ export class HTMLOperator extends Operator {
         }
       )
       this.logger.info('html gen done')
+      // fs.writeFileSync('./index.html', html)
       return html
     } catch (error) {
       this.logger.error(error)

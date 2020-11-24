@@ -7,6 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>档线表</title>
   <style>
+    @font-face {
+      font-family: "NotoSansCJK";
+      src: url("./NotoSansCJK-Regular-1.otf");
+    }
+    * {
+      font-family: "NotoSansCJK";
+    }
     .root {
       padding: 30px 10px 10px 20px;
       width: 1252px;
