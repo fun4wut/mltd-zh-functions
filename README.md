@@ -8,7 +8,7 @@
 
 ## API 一览
 
-**PREFIX: https://mltd-function.azurewebsites.net/api**
+**PREFIX: https://mltd-zh.azurewebsites.net/api**
 
 1. 查询PT档线和高分档线（Rank 1, 15, 250, 500, 1000, 2000）
    API：`/events/{id}/rankings/borderPoints`
@@ -46,14 +46,12 @@
 - [x]  mongo 数据库重构
     - [x]  date不再是ref
     - [x]  搬到Azure？500M太少了
-- [ ]  dayjs替换Date
+- [x]  dayjs替换Date
 - [x]  github action
 - [x]  获取档线可以指定summaryTime
 - [ ]  给azure function上个好点的类型提示
 - [ ]  ML涩图：抓取放到OSS中（Azure Blob Storage）
-- [ ]  图片版
-    - [ ]  头像资源获取（直接从网上抓吧）
-    - [ ]  input绑定到cosmos，收到rank增加后，生成处理图片，放到Blob上
+- [x]  图片版
 - [x]  简繁转换
 - [x]  函数抽离
 - [ ]  GraphQL替代Restful
