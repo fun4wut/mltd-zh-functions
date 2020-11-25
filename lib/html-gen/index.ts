@@ -1,6 +1,6 @@
 import template from 'art-template'
 import zipWith from 'lodash.zipwith'
-import fs from 'fs'
+import { Context } from '@azure/functions'
 import dayjs from 'dayjs'
 import { resolve } from 'path'
 import { BorderPointsDiff } from '@lib/types'
@@ -13,6 +13,10 @@ const getDelta = (cur: { score: number }, base?: { score: number | null }) =>
 template.defaults.minimize = true
 
 export class HTMLOperator extends Operator {
+  constructor(ctx: Context) {
+    super(ctx)
+    this.logger.info(`TimeZone is ${dayjs.tz.guess()}`)
+  }
   genHTML(diff: BorderPointsDiff) {
     const reOrganize = (key: 'eventPoint' | 'highScore') =>
       zipWith(
@@ -36,9 +40,9 @@ export class HTMLOperator extends Operator {
       const html: string = template(
         resolve(__dirname, '../../../lib/html-gen/index.art'),
         {
-          summaryTime: dayjs(diff.current.eventPoint.summaryTime).format(
-            'YYYY-MM-DD HH:mm'
-          ),
+          summaryTime: dayjs(diff.current.eventPoint.summaryTime)
+            .tz('Asia/Shanghai')
+            .format('YYYY-MM-DD HH:mm'),
           evtName: diff.current.evtName,
           background: `https://storage.matsurihi.me/mltd/event_bg/${(
             diff.current.evtId + ''
