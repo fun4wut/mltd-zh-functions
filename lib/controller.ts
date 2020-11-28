@@ -1,12 +1,13 @@
 import { Context } from '@azure/functions'
-import { maybe } from 'typescript-monads'
 import { isDocument, DocumentType } from '@typegoose/typegoose'
 import dayjs, { Dayjs } from 'dayjs'
+import axios from 'axios'
 import { Dict, evtCache } from './utils'
 import { MLTDEvt, MLTDEvtModel, MLTDRank, MLTDRankModel } from './database/defs'
 import { DBOperator } from './database'
 import { BorderPointsDiff, EvtType, MLTDFull } from './types'
 import { Operator } from './operator'
+import { EVT_NOT_FOUND, NO_SUCH_TIME_IMG } from './errors'
 
 const enum Interval {
   NOW = 0,
@@ -15,23 +16,47 @@ const enum Interval {
   ONE_DAY = 60 * 24,
 }
 
+
 export const getLast = (interval: Interval, baseTime?: Date) => {
   if (!!baseTime) {
-    return dayjs(baseTime).subtract(interval, 'minute').toDate()
+    return dayjs(baseTime).subtract(interval, 'minute')
   }
   const summary = dayjs()
   return summary
     .startOf('hour')
     .add(summary.minute() > 30 ? 30 : 0, 'minute')
     .subtract(interval, 'minute')
-    .toDate()
 }
+const BLOB_PREFIX =
+  'https://storageaccountmltdz8de9.blob.core.windows.net/mltd-img'
 
 export class APIOperator extends Operator {
   private db: DBOperator
   constructor(ctx: Context) {
     super(ctx)
     this.db = new DBOperator(ctx)
+  }
+
+  /**
+   * 返回活动的最新的档线图片的地址
+   */
+  async getImg(evtName: string | number) {
+    const evtBase = evtCache.findEvt(evtName)
+    return evtBase.match({
+      some: async obj => {
+        const evt = (await MLTDEvtModel.findByEvtId(obj.evtId))!
+        const actualTime =
+          new Date().getTime() > evt.date.evtEnd.getTime()
+            ? dayjs(evt.date.evtEnd).add(30, 'minute').add(1, 'second') // 历史活动
+            : getLast(Interval.NOW) // 当前活动
+        const fileName = actualTime.tz('UTC').format('YYYY-MM-DDTHH-mm[Z.png]')
+        return axios.head(`${BLOB_PREFIX}/${fileName}`).then(
+          () => `${BLOB_PREFIX}/${fileName}`,
+          () => Promise.reject(NO_SUCH_TIME_IMG)
+        )
+      },
+      none: () => Promise.reject(EVT_NOT_FOUND),
+    })
   }
 
   /**
@@ -46,7 +71,7 @@ export class APIOperator extends Operator {
         Interval.ONE_HOUR,
         Interval.ONE_DAY,
       ].map(inter => {
-        return this.getBorderPoints(evtId, getLast(inter, baseTime))
+        return this.getBorderPoints(evtId, getLast(inter, baseTime).toDate())
       })
     ).then(res => ({
       current: res[0]!,
@@ -65,10 +90,7 @@ export class APIOperator extends Operator {
     evtName: string | number,
     summaryTime?: Date
   ): Promise<MLTDFull | null> {
-    const evtBase =
-      typeof evtName === 'string'
-        ? evtCache.fuzzySearch(evtName)
-        : maybe(evtName === 0 ? evtCache.currentEvt() : Dict.get(evtName))
+    const evtBase = evtCache.findEvt(evtName)
     return evtBase.match({
       some: async obj => {
         this.logger.info(`要查询的活动evtId为${obj.evtId}`)
@@ -107,7 +129,7 @@ export class APIOperator extends Operator {
           ...evt.toObject(),
         }
       },
-      none: () => Promise.reject('未找到该活动！'),
+      none: () => Promise.reject(EVT_NOT_FOUND),
     })
   }
 }

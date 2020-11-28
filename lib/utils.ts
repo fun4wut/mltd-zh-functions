@@ -15,6 +15,11 @@ export const evtCache = {
     maybe(fuse.search(s2t(pattern))[0]).map(elm => elm.item),
   currentEvt: () =>
     Dict.get([...Dict.keys()].reduce((prev, now) => Math.max(now, prev), 0))!,
+  findEvt(evtName: string | number) {
+    return typeof evtName === 'string'
+      ? evtCache.fuzzySearch(evtName)
+      : maybe(evtName === 0 ? evtCache.currentEvt() : Dict.get(evtName))
+  },
 }
 
 /**

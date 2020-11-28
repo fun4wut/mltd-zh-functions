@@ -86,7 +86,7 @@ export class CaptureOperator extends Operator {
             return retry(err)
           }),
       {
-        retries: 3,
+        retries: 1,
       }
     )
   }

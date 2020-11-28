@@ -29,7 +29,7 @@ export interface RankParam {
   ranking_compare_type: 1 // 保存为1不动
   ranking_type: RankType
   mst_event_id: number // 事件id，可以使用PrincessAPI获得
-  lounge_id: '' // 休息室，台服无
+  lounge_id: '' // 工会，咕了
   offset_rank: number // 要查询的排名
   limit: number // 查询多少位P（从offset_rank算起）
   lounge_id_list: []
