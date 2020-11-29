@@ -2,6 +2,8 @@ import _axios from 'axios'
 import { HttpsProxyAgent } from 'https-proxy-agent'
 import promiseRetry from 'promise-retry'
 import fs from 'fs'
+import tmpUtil from 'tmp'
+import path from 'path'
 
 import { decRes, encReq } from './magic'
 import { createReq, RankType, ReqMethod } from './defs'
@@ -12,7 +14,10 @@ const BaseUrl = 'https://theaterdays-zh.appspot.com'
 // login用的body，因为不需要动，所以直接传上去就行
 const loginData = `wp7_RNHLxP6m2KeusXpBZOVSUz9JN9UfAusjMGDLMT33I_0MteyeK_3rKoqqYz3wud-kXxHiXHO79KXVq4lrTFN109aEVmgg9GUdIm-lBwOkNOMHiSRoWYn7CCAp4dUmkHZCznFCOhrFqG741ck_3aG897t-hpVnOnEC-Y6ShZUIYYmnncBmI5EZW3ZzVL-q-CtQpsfYBVY9s1c1Y-_bajFXaJoBiUR3sDZeIn5FzEScjTFooPxUssgSv83ern6SDdjyfRUUaqYugU8X2aggKKp8kasuNs5AkFxtWvJRywuUwL56XnBYsgQMSBovLh6Q9cfU7mvRI2DeRyN-XTeyKXtHCLgKyzqXwcpxBaWRVgax50WZhBkxZCCEnXQP8z0Wk6RN2o8vUSVjWtt9Q-KF0uRa7ZVkmdXebRm_6QyRx1JW6NoY6vfw0e5z6nS9PCxf`
 
-const cachePath = './.auth_cache'
+const cachePath = path.join(
+  tmpUtil.tmpdir,
+  `.auth_cache_${loginData.substr(0, 10)}`
+)
 
 const getAuth = () => {
   if (fs.existsSync(cachePath)) {
