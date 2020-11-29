@@ -19,18 +19,10 @@ const httpTrigger: AzureFunction = function (ctx: Context, req: HttpRequest) {
   }
   // 判断是数字还是字符串
   const keyword = !!parseInt(evtId) ? parseInt(evtId) : evtId
-  return maybe(req.query.multiple).match({
-    some: () =>
-      operator.getLastFour(keyword as number).then(
-        res => customJson(res),
-        err => customErr(err)
-      ),
-    none: () =>
-      operator.getBorderPoints(keyword, summary).then(
-        res => customJson(res, ['parentEvt', 'latestRank']),
-        err => customErr(err)
-      ),
-  })
+  return operator.getBorderPoints(keyword, summary).then(
+    res => customJson(res, ['parentEvt', 'latestRank']),
+    err => customErr(err)
+  )
 }
 
 export default httpTrigger

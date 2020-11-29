@@ -52,7 +52,7 @@ export class DBOperator extends Operator {
   /**
    * 定期执行，获取最新档线，并保存至数据库
    */
-  async fetchBorderPoints(_evtId?: number) {
+  async fetchBorderPoints(force: boolean, _evtId?: number) {
     const evtId = _evtId ?? evtCache.currentEvt().evtId
     // evt必定存在
     const evt = (await MLTDEvtModel.findByEvtId(evtId))!
@@ -94,8 +94,9 @@ export class DBOperator extends Operator {
     })
     if (exists) {
       this.logger.warn('发现重复的档线，不保存至数据库')
-      // return Promise.reject('no newer')
-      return evt.populate('latestRank').execPopulate()
+      return force // 如果是force（手动触发，不抛错误）
+        ? evt.populate('latestRank').execPopulate()
+        : Promise.reject('no newer')
     }
     const rk = await MLTDRankModel.create({
       eventPoint: ptsRes,

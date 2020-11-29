@@ -1,7 +1,7 @@
 import 'module-alias/register'
 import { AzureFunction, Context } from '@azure/functions'
 import { DBOperator } from '@lib/database'
-import { customErr, customJson } from '@lib/utils'
+import { customErr, customJson, isFinalRanking } from '@lib/utils'
 import { APIOperator } from '@lib/controller'
 import { HTMLOperator } from '@lib/html-gen'
 import { isDocument } from '@typegoose/typegoose'
@@ -9,7 +9,7 @@ import { isDocument } from '@typegoose/typegoose'
 const httpTrigger: AzureFunction = async function (ctx: Context) {
   const { evtId } = ctx.bindingData
   return new DBOperator(ctx)
-    .fetchBorderPoints(evtId > 0 ? evtId : undefined)
+    .fetchBorderPoints(true, evtId > 0 ? evtId : undefined)
     .then(
       async res => {
         const api = new APIOperator(ctx)
@@ -18,6 +18,7 @@ const httpTrigger: AzureFunction = async function (ctx: Context) {
         }
         const diff = await api.getLastFour(
           res.evtId,
+          isFinalRanking(res),
           res.latestRank.eventPoint.summaryTime
         )
         const html = new HTMLOperator(ctx).genHTML(diff)

@@ -40,9 +40,11 @@ export class HTMLOperator extends Operator {
       const html: string = template(
         resolve(__dirname, '../../../lib/html-gen/index.art'),
         {
-          summaryTime: dayjs(diff.current.eventPoint.summaryTime)
-            .tz('Asia/Shanghai')
-            .format('YYYY-MM-DD HH:mm'),
+          summaryTime: diff.isFinal
+            ? '最终排名' // 最终排名不显示时间了，避免造成误解
+            : dayjs(diff.current.eventPoint.summaryTime)
+                .tz('Asia/Shanghai')
+                .format('YYYY-MM-DD HH:mm'),
           evtName: diff.current.evtName,
           background: `https://storage.matsurihi.me/mltd/event_bg/${(
             diff.current.evtId + ''

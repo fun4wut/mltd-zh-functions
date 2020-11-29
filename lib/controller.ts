@@ -13,6 +13,7 @@ const enum Interval {
   NOW = 0,
   HALF_HOUR = 30,
   ONE_HOUR = 60,
+  ONE_AND_HALF_HOUR = 90,
   ONE_DAY = 60 * 24,
 }
 
@@ -62,12 +63,16 @@ export class APIOperator extends Operator {
    * 获取活动的最后四次档线数据
    * @param evtId 活动id
    */
-  async getLastFour(evtId: number, baseTime?: Date): Promise<BorderPointsDiff> {
+  async getLastFour(
+    evtId: number,
+    isFinal: boolean,
+    baseTime: Date
+  ): Promise<BorderPointsDiff> {
     return Promise.all(
       [
         Interval.NOW,
-        Interval.HALF_HOUR,
-        Interval.ONE_HOUR,
+        isFinal ? Interval.ONE_HOUR : Interval.HALF_HOUR, // 最终档线的summaryTime在9点半，需要做个修正
+        isFinal ? Interval.ONE_AND_HALF_HOUR : Interval.ONE_HOUR,
         Interval.ONE_DAY,
       ].map(inter => {
         return this.getBorderPoints(evtId, getLast(inter, baseTime).toDate())
@@ -77,6 +82,7 @@ export class APIOperator extends Operator {
       lastHalf: res[1],
       lastHour: res[2],
       lastDay: res[3],
+      isFinal,
     }))
   }
 
@@ -118,7 +124,7 @@ export class APIOperator extends Operator {
               // 确保latestRank存在
               isDocument(evt.latestRank) && !!evt.latestRank
                 ? evt
-                : this.db.fetchBorderPoints(evt.evtId)
+                : this.db.fetchBorderPoints(true, evt.evtId)
             )
           // 这里偷懒，不想写type guard了
           rank = (evt.latestRank as unknown) as DocumentType<MLTDRank>

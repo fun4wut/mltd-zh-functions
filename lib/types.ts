@@ -45,4 +45,5 @@ export interface BorderPointsDiff {
   lastHalf: MLTDFull | null
   lastHour: MLTDFull | null
   lastDay: MLTDFull | null
+  isFinal: boolean
 }

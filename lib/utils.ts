@@ -4,6 +4,7 @@ import { s2t } from 'chinese-s2t'
 
 import { MLTDEvt, MLTDRank } from './database/defs'
 import { IEvtBase } from './types'
+import { isDocument } from '@typegoose/typegoose'
 
 const fuse = new Fuse<IEvtBase>([], {
   keys: ['evtName', 'evtId'],
@@ -21,6 +22,11 @@ export const evtCache = {
       : maybe(evtName === 0 ? evtCache.currentEvt() : Dict.get(evtName))
   },
 }
+
+export const isFinalRanking = (evt: MLTDEvt) =>
+  isDocument(evt.latestRank) &&
+  evt.latestRank.eventPoint.summaryTime.getTime() ===
+    evt.date.evtEnd.getTime() + 1801 * 1000 // 半小时加一秒
 
 /**
  * evtId到baseEvt的映射
