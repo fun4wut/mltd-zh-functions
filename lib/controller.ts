@@ -16,7 +16,6 @@ const enum Interval {
   ONE_DAY = 60 * 24,
 }
 
-
 export const getLast = (interval: Interval, baseTime?: Date) => {
   if (!!baseTime) {
     return dayjs(baseTime).subtract(interval, 'minute')

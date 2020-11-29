@@ -11,7 +11,9 @@ const httpTrigger: AzureFunction = async function (ctx: Context) {
   // 判断是数字还是字符串
   const keyword = !!parseInt(evtId) ? parseInt(evtId) : evtId
   return new APIOperator(ctx).getImg(keyword).then(
-    res => res,
+    res => ({
+      body: res,
+    }),
     err => customErr(err)
   )
 }
