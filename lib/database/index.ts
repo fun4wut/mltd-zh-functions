@@ -83,7 +83,7 @@ export class DBOperator extends Operator {
           }),
       {
         minTimeout: 1000 * 30, // 每30秒重新执行一次，直到成功为止
-        retries: 3, // 最大尝试次数为3次
+        retries: 2, // 最大尝试次数为3次
         factor: 1, // 等待时间保持不变
       }
     )
@@ -95,7 +95,7 @@ export class DBOperator extends Operator {
     if (exists) {
       this.logger.warn('发现重复的档线，不保存至数据库')
       // return Promise.reject('no newer')
-      return evt
+      return evt.populate('latestRank').execPopulate()
     }
     const rk = await MLTDRankModel.create({
       eventPoint: ptsRes,

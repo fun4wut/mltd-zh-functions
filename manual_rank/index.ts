@@ -4,6 +4,7 @@ import { DBOperator } from '@lib/database'
 import { customErr, customJson } from '@lib/utils'
 import { APIOperator } from '@lib/controller'
 import { HTMLOperator } from '@lib/html-gen'
+import { isDocument } from '@typegoose/typegoose'
 
 const httpTrigger: AzureFunction = async function (ctx: Context) {
   const { evtId } = ctx.bindingData
@@ -12,8 +13,15 @@ const httpTrigger: AzureFunction = async function (ctx: Context) {
     .then(
       async res => {
         const api = new APIOperator(ctx)
-        const diff = await api.getLastFour(res.evtId)
+        if (!isDocument(res.latestRank)) {
+          return
+        }
+        const diff = await api.getLastFour(
+          res.evtId,
+          res.latestRank.eventPoint.summaryTime
+        )
         const html = new HTMLOperator(ctx).genHTML(diff)
+
         ctx.bindings.res = customJson('update OK')
         if (!!html) {
           ctx.bindings.outputQueueItem = JSON.stringify({
