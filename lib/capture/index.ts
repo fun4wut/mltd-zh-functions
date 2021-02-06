@@ -97,8 +97,12 @@ export class CaptureOperator extends Operator {
   }
 
   // 抓取档线信息
-  async getRanks(evtId: number, rkType: RankType): Promise<IEvtRank> {
-    const reqData = [1, 15, 250, 500, 1000, 2000].map(num =>
+  async getRanks(
+    evtId: number,
+    rkType: RankType,
+    ranks: number[]
+  ): Promise<IEvtRank> {
+    const reqData = ranks.map(num =>
       createReq({
         method: ReqMethod.Ranking,
         id: `pickup${num}`,

@@ -65,8 +65,8 @@ export class DBOperator extends Operator {
     const [ptsRes, scoreRes] = await promiseRetry(
       (retry, times) =>
         Promise.all([
-          this.capture.getRanks(evtId, RankType.Pts),
-          this.capture.getRanks(evtId, RankType.Score),
+          this.capture.getRanks(evtId, RankType.Pts, [1, 2, 3, 15, 16, 250, 251, 500]),
+          this.capture.getRanks(evtId, RankType.Score, [1, 15, 250, 500]),
         ])
           .then(rankRes =>
             this.notLatest(
@@ -92,6 +92,7 @@ export class DBOperator extends Operator {
       'eventPoint.summaryTime': ptsRes.summaryTime,
       parentEvt: evt._id,
     })
+
     if (exists) {
       this.logger.warn('发现重复的档线，不保存至数据库')
       return force // 如果是force（手动触发，不抛错误）
