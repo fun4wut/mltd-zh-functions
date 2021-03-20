@@ -12,7 +12,7 @@ import { Operator } from '../operator'
 
 const BaseUrl = 'https://theaterdays-zh.appspot.com'
 // login用的body，因为不需要动，所以直接传上去就行
-const loginData = `wp7_RNHLxP6m2KeusXpBZOVSUz9JN9UfAusjMGDLMT33I_0MteyeK_3rKoqqYz3wud-kXxHiXHO79KXVq4lrTFN109aEVmgg9GUdIm-lBwOkNOMHiSRoWYn7CCAp4dUmkHZCznFCOhrFqG741ck_3aG897t-hpVnOnEC-Y6ShZUIYYmnncBmI5EZW3ZzVL-q-CtQpsfYBVY9s1c1Y-_bajFXaJoBiUR3sDZeIn5FzEScjTFooPxUssgSv83ern6SDdjyfRUUaqYugU8X2aggKKp8kasuNs5AkFxtWvJRywuUwL56XnBYsgQMSBovLh6Q9cfU7mvRI2DeRyN-XTeyKXtHCLgKyzqXwcpxBaWRVgax50WZhBkxZCCEnXQP8z0Wk6RN2o8vUSVjWtt9Q-KF0uRa7ZVkmdXebRm_6QyRx1JW6NoY6vfw0e5z6nS9PCxf`
+const loginData = `KtVpqYbkiwRihnt9XJGofjuysiUpPC4WMM-qnNKCIvbDJoj-dvDKp6XJRnaMuLPBuEKRdTR9rkqX3g9hzXXeaiPgwBNIZNjT-2z5-3JNTRQ3gXfAF7pqsddqU0Is_ZQiyCAwI1nj0gr1h4ZpCz3l0KYT_j-7i3fhUm3CpA0O7TF_lN9kKdoahVZaS10pc6HlgloTpBaVqU6t6yWOLg1XHZ5LZ65qdd8kgBx-UYvKkT8omordtRxJGuh0TrI1wlpWiyYpr7PVqgrY6YpIG8_WjearbdGn_3QVrNT2hrlMjELsUAi3FIuKQxzBbauRFxK2ShpJhD-WUewdWomg0wSVdx0eqZ6ctk69j97pak4QlbXZlhVeTiu88Zwq1-8uSobqWrU2oqLCh8SLfIkIWbi441WvWJs5odWLteFHsbnMNFL28ohKCKSUXhW8bwlXLBhQ`
 
 const cachePath = path.join(
   tmpUtil.tmpdir,
@@ -45,9 +45,9 @@ const axios = _axios.create({
     'Content-Type': 'application/json',
     Authorization: `Bearer ${getAuth()}`,
     'X-Application-Platform': 'google',
-    'X-Application-Version': '1.6.000',
-    'X-Unity-Version': '2017.4.29f1',
-    'X-Device-Time': '2020-11-08T12:43:04.703076+08:00',
+    'X-Application-Version': '2.0.001',
+    'X-Unity-Version': '2018.4.30f1',
+    'X-Device-Time': '2021-03-20T10:38:10.287726+08:00',
     'X-Device-Name': 'OnePlus ONEPLUS A5000',
     'X-Os-Name': 'android',
     'X-Os-Version': '8.1.0',
@@ -56,11 +56,11 @@ const axios = _axios.create({
     'X-Encryption': 'on',
     'X-Encryption-Mode': '3',
     'X-Encryption-Compress': 'gzip',
-    'X-Version-Hash': '0c06420a073cf075da4b122f13ebaaad3383db3c',
+    'X-Version-Hash': '724add9c1554f6cf11939b5b9e655881e6a2ac0b',
     'X-App-Flag1': '2',
     'X-App-Flag2': '0',
-    'X-App-Flag3': '0',
-    'X-App-Flag4': '44',
+    'X-App-Flag3': '22000000',
+    'X-App-Flag4': '0',
     Host: 'theaterdays-zh.appspot.com',
     TE: 'identity',
     'User-Agent': 'BestHTTP',
@@ -154,7 +154,10 @@ export class CaptureOperator extends Operator {
     const res = await axios
       .post('/auth/AuthService.Login', loginData)
       .then(res => decRes(res.data))
-      .then(res => res.result.token)
+      .then(res => {
+        console.log(res)
+        return res.result.token
+      })
     axios.defaults.headers.Authorization = `Bearer ${res}`
     this.logger.info('登录成功')
     setAuth(res)
