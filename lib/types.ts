@@ -6,6 +6,8 @@ export enum EvtType {
   Tour,
   Traditional,
   Anniversary,
+  MLWorking,
+  AprilFool,
 }
 
 export interface IEvtBase {
