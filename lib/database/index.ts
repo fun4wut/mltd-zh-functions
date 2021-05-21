@@ -82,9 +82,8 @@ export class DBOperator extends Operator {
             return retry(err)
           }),
       {
-        minTimeout: 1000 * 60, // 每60秒重新执行一次，直到成功为止
+        minTimeout: 1000 * 30, // 每30秒重新执行一次，直到成功为止
         retries: 2, // 最大尝试次数为3次
-        factor: 1, // 等待时间保持不变
       }
     )
     // 检查这个档线是不是已经有了，避免重复
