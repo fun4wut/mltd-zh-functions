@@ -116,6 +116,7 @@ export class CaptureOperator extends Operator {
             limit: 1,
             mst_event_id: evtId,
             ranking_type: rkType,
+            event_ranking_display_type: 0,
           },
         ],
       })
@@ -127,7 +128,6 @@ export class CaptureOperator extends Operator {
       '/rpc/RankingService.GetRanking',
       encReq(reqData)
     )
-
     const scores: IEvtRank['scores'] = []
     for (const item of res) {
       const user = item.result.ranking_list[0]

@@ -34,6 +34,7 @@ export interface RankParam {
   limit: number // 查询多少位P（从offset_rank算起）
   lounge_id_list: []
   only_use_ranking_data: boolean // 是否只获取排名信息，设为false可以拿到各个P的详细信息
+  event_ranking_display_type: number
 }
 
 export function createReq(obj: MagicReq): Required<MagicReq> {

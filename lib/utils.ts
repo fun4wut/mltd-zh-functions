@@ -10,12 +10,21 @@ const fuse = new Fuse<IEvtBase>([], {
   keys: ['evtName', 'evtId'],
 })
 
+export const touchFish = [1, 2, 6]
+
 export const evtCache = {
   setFuse: (list: IEvtBase[]) => fuse.setCollection(list),
   fuzzySearch: (pattern: string) =>
     maybe(fuse.search(s2t(pattern))[0]).map(elm => elm.item),
-  currentEvt: () =>
-    Dict.get([...Dict.keys()].reduce((prev, now) => Math.max(now, prev), 0))!,
+  currentEvt: () => {
+    return Dict.get(
+      [...Dict.entries()].reduce(
+        (prev, now) =>
+          touchFish.includes(now[1].evtType) ? prev : Math.max(now[0], prev),
+        0
+      )
+    )!
+  },
   findEvt(evtName: string | number) {
     return typeof evtName === 'string'
       ? evtCache.fuzzySearch(evtName)

@@ -5,7 +5,7 @@ import { HttpsProxyAgent } from 'https-proxy-agent'
 import { CaptureOperator } from '../capture'
 import { RankType } from '../capture/defs'
 import { MLTDEvtModel, MLTDRankModel } from './defs'
-import { evtCache, Dict } from '../utils'
+import { evtCache, Dict, touchFish } from '../utils'
 import { EvtType, IEvtDate } from '../types'
 import { Operator } from '../operator'
 import { Context } from '@azure/functions'
@@ -114,7 +114,6 @@ export class DBOperator extends Operator {
    */
   async fetchAllEvents() {
     const data: any[] = await this.wrappedFetch('/events').then(res => res.data)
-
     const tasks = data.map(async item => {
       // 设置 Dict
       Dict.set(item.id, {
@@ -131,9 +130,12 @@ export class DBOperator extends Operator {
         evtBegin: new Date(item.schedule.beginDate),
         evtEnd: new Date(item.schedule.endDate),
         // 摸鱼活动没有加速
-        boostBegin:
-          item.type > 2 ? new Date(item.schedule.boostBeginDate) : null,
-        boostEnd: item.type > 2 ? new Date(item.schedule.boostEndDate) : null,
+        boostBegin: !touchFish.includes(item.type)
+          ? new Date(item.schedule.boostBeginDate)
+          : null,
+        boostEnd: !touchFish.includes(item.type)
+          ? new Date(item.schedule.boostEndDate)
+          : null,
       }
       await MLTDEvtModel.create({
         evtId: item.id,
